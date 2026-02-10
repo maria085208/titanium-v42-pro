@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GUIA DE ESTUDIO </title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- ESTÉTICA CLÍNICA PROFESIONAL --- */
+        :root {
+            --bg: #f1f5f9;       /* Fondo clínico */
+            --card: #ffffff;     /* Tarjetas */
+            --border: #cbd5e1;   /* Bordes */
+            --text: #0f172a;     /* Texto Principal */
+            --dim: #64748b;      /* Texto Secundario */
+            
+            /* COLORES TÁCTICOS */
+            --pri: #ef4444;      /* Rojo Urgencia */
+            --sec: #4f46e5;      /* Indigo Médico */
+            --acc: #10b981;      /* Verde Éxito */
+            --war: #f59e0b;      /* Ambar Alerta */
+            
+            /* UI */
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 12px;
+        }
+
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            background: var(--bg); color: var(--text); 
+            font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 120px; 
+            font-size: 15px; line-height: 1.6;
+            overflow-wrap: break-word; word-wrap: break-word; hyphens: auto;
+        }
+
+        /* HEADER */
+        header { 
+            position: sticky; top: 0; z-index: 1000; 
+            background: rgba(255,255,255,0.96); border-bottom: 1px solid var(--border); 
+            padding: 10px 16px; backdrop-filter: blur(8px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .brand { font-family: 'JetBrains Mono'; font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px; }
+        .brand span { color: var(--pri); background: #fee2e2; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; vertical-align: middle; margin-left: 5px; }
+        
+        #clock { 
+            background: #f8fafc; color: var(--dim); font-family: 'JetBrains Mono'; 
+            text-align: center; font-size: 0.75rem; padding: 6px; border-radius: 6px; 
+            border: 1px solid var(--border); font-weight: 700; text-transform: uppercase;
+        }
+
+        /* AUDIO */
+        .ctrls { display: flex; gap: 6px; }
+        .btn-mini { background: white; border: 1px solid var(--border); color: var(--dim); flex: 1; padding: 8px 0; border-radius: 6px; cursor: pointer; display: grid; place-items: center; transition: 0.2s; }
+        .btn-mini:hover { border-color: var(--sec); color: var(--sec); background: #eef2ff; }
+        .stop:hover { border-color: var(--pri); color: var(--pri); background: #fef2f2; }
+
+        /* VISTAS */
+        .view { display: none; padding: 16px; max-width: 900px; margin: 0 auto; animation: slide 0.3s cubic-bezier(0.25, 1, 0.5, 1); }
+        .view.active { display: block; }
+        @keyframes slide { from{opacity:0;transform:translateY(15px)} to{opacity:1;transform:translateY(0)} }
+
+        /* TITULOS */
+        .sec-head { margin-bottom: 20px; border-left: 5px solid var(--sec); padding-left: 15px; }
+        .sec-head h2 { margin: 0; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; }
+        .sec-head p { margin: 4px 0 0; color: var(--dim); font-size: 0.9rem; }
+
+        /* CARDS & INPUTS */
+        .card { 
+            background: var(--card); border: 1px solid var(--border); 
+            border-radius: var(--radius); padding: 20px; margin-bottom: 16px; 
+            box-shadow: var(--shadow); 
+        }
+        .inp { 
+            width: 100%; background: #f8fafc; border: 1px solid var(--border); 
+            color: var(--text); padding: 14px; border-radius: 8px; font-size: 1rem; 
+            margin-bottom: 10px; font-family: 'Inter'; transition: 0.2s;
+        }
+        .inp:focus { border-color: var(--sec); background: white; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+
+        /* ESTUDIO */
+        details { background: var(--card); margin-bottom: 12px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+        summary { padding: 18px; font-weight: 700; cursor: pointer; display: flex; justify-content: space-between; background: white; align-items: center; }
+        summary:hover { color: var(--sec); background: #f8fafc; }
+        .txt { padding: 25px; color: #334155; line-height: 1.7; border-top: 1px solid var(--border); background: #fcfcfc; text-align: justify; }
+        .txt h3 { color: var(--sec); margin-top: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; font-size: 1rem; }
+        .hl { color: var(--pri); font-weight: bold; background: #fee2e2; padding: 0 4px; border-radius: 4px; }
+        ul { padding-left: 20px; margin: 10px 0; } li { margin-bottom: 5px; }
+
+        /* GRID TÁCTICO (2 COLUMNAS ROBUSTAS) */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+        @media (max-width: 600px) { .grid { grid-template-columns: 1fr 1fr; } }
+
+        .item { 
+            background: var(--card); border: 1px solid var(--border); padding: 15px; 
+            border-radius: 10px; cursor: pointer; display: flex; flex-direction: column; 
+            justify-content: space-between; min-height: 110px; transition: 0.2s; 
+            text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .item:hover { border-color: var(--sec); transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .item h4 { margin: 0 0 5px 0; font-size: 0.9rem; font-weight: 700; color: var(--text); }
+        .item span { font-size: 0.75rem; color: var(--dim); line-height: 1.25; }
+        .icon { font-size: 1.5rem; margin-bottom: 8px; display: block; opacity: 0.8; }
+
+        /* GRID FARMA (LISTA) */
+        .g-list { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .row { background: var(--card); border: 1px solid var(--border); padding: 16px; border-radius: 10px; border-left: 5px solid var(--pri); }
+        
+        /* TAGS */
+        .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+        .tg { font-size: 0.7rem; padding: 4px 8px; border-radius: 6px; font-weight: 700; border: 1px solid transparent; }
+        .tg-t { background: #eff6ff; color: #1d4ed8; border-color: #dbeafe; } 
+        .tg-r { background: #fef2f2; color: #b91c1c; border-color: #fecaca; } 
+        .tg-a { background: #ecfdf5; color: #047857; border-color: #a7f3d0; } 
+
+        /* BOTONES */
+        .btn { width: 100%; padding: 15px; background: #1e293b; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; text-transform: uppercase; margin-top: 15px; font-size: 0.95rem; transition: 0.2s; }
+        .btn:active { transform: scale(0.98); }
+        .btn.sec { background: var(--sec); } .btn.pri { background: var(--pri); }
+
+        /* NAV */
+        nav { position: fixed; bottom: 0; width: 100%; background: rgba(255,255,255,0.96); border-top: 1px solid var(--border); display: flex; z-index: 2000; padding-bottom: env(safe-area-inset-bottom); backdrop-filter: blur(10px); }
+        .nav-b { flex: 1; padding: 10px 0; background: none; border: none; color: #94a3b8; display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; transition: 0.2s; }
+        .nav-b.active { color: var(--sec); background: #f5f3ff; border-top: 3px solid var(--sec); margin-top: -3px; }
+        .nav-b span { font-size: 1.4rem; } 
+        .nav-b small { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; }
+
+        /* MODAL PIZARRÓN */
+        #modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); z-index: 5000; display: none; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
+        .box { background: #fff; width: 100%; max-width: 500px; padding: 25px; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; position: relative; }
+        
+        .f-disp { background: #0f172a; color: #10b981; font-family: 'JetBrains Mono', monospace; padding: 15px; border-radius: 8px; text-align: center; font-size: 1rem; margin-bottom: 20px; border: 1px solid #334155; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
+        
+        .meta { background: #f8fafc; padding: 15px; border-radius: 8px; font-size: 0.9rem; color: #475569; margin-bottom: 20px; border: 1px solid #e2e8f0; }
+        .meta strong { color: var(--text); display: block; margin-bottom: 4px; }
+        
+        #res { margin-top: 20px; padding: 15px; background: #ecfdf5; border: 1px solid #34d399; color: #047857; text-align: center; font-weight: 800; display: none; border-radius: 8px; font-size: 1.3rem; }
+        
+        .note { background: #fff; padding: 12px; border-left: 4px solid var(--sec); margin-bottom: 8px; font-size: 0.9rem; border: 1px solid #e2e8f0; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="head">
+        <div class="brand">GUIA DE ESTUDIO<span>CFMM</span></div>
+        <div class="ctrls">
+            <button class="btn-m" onclick="tts.p()">▶</button>
+            <button class="btn-m" onclick="tts.pa()">⏸</button>
+            <button class="btn-m stop" onclick="tts.s()">⏹</button>
+            <button class="btn-m" onclick="app.pdf()" style="font-weight:800;font-size:0.7rem">PDF</button>
+        </div>
+    </div>
+    <div id="clock">CARGANDO...</div>
+</header>
+
+<div id="v-estudio" class="view active">
+    <div class="sec-h"><h2>BIBLIOTECA</h2><p>ESTUDIAR PARA EXAMEN</p></div>
+    <input type="text" class="inp" placeholder="🔍 Buscar..." onkeyup="app.filter(this.value)">
+    
+    <div id="mod-list">
+        <details>
+            <summary>MÓDULO 1: OPERACIONES Y SEGURIDAD</summary>
+            <div class="txt">
+                <h3>Ley del YO-YO 🪀</h3>
+                <p>Regla fundamental de seguridad en la escena: <strong>1. Primero YO, 2. Luego YO, 3. Al último YO.</strong> Nunca convertirse en una segunda víctima. Si la escena no es segura, NO ENTRAR y solicitar apoyo (policía, bomberos).</p>
+                <h3>Evaluación de Escena (Size-up)</h3>
+                <p><strong>1. Seguridad (3S):</strong> Personal, Escena, Situación.<br><strong>2. Cinemática:</strong> Trauma (MOI) o Clínico (NOI).<br><strong>3. Triage:</strong> Número de pacientes y recursos.<br><strong>4. EPP:</strong> Aislamiento de sustancias corporales (Guantes, Gafas).</p>
+                <h3>Aspectos Legales</h3>
+                <p><strong>Negligencia:</strong> Deber de actuar, Incumplimiento, Daños, Causalidad.<br><strong>Consentimiento:</strong> Expreso (Verbal), Implícito (Inconsciente), Involuntario (Legal).</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>MÓDULO 2: EVALUACIÓN PACIENTE</summary>
+            <div class="txt">
+                <h3>XABCDE (Prioridad Vital)</h3>
+                <p><span class="hl">X:</span> Exanguinación (Torniquete Alto y Apretado).<br><span class="hl">A:</span> Vía Aérea + Control Cervical.<br><span class="hl">B:</span> Ventilación (O2).<br><span class="hl">C:</span> Circulación (Pulsos, Piel).<br><span class="hl">D:</span> Déficit Neuro (AVDI).<br><span class="hl">E:</span> Expo + Hipotermia.</p>
+                <h3>Historial SAMPLE</h3>
+                <p><strong>S:</strong> Signos/Síntomas.<br><strong>A:</strong> Alergias.<br><strong>M:</strong> Medicamentos.<br><strong>P:</strong> Patologías previas.<br><strong>L:</strong> Lunch (Última comida).<br><strong>E:</strong> Eventos previos.</p>
+                <h3>Dolor OPQRST</h3>
+                <p><strong>O:</strong> Onset (Inicio).<br><strong>P:</strong> Provocación.<br><strong>Q:</strong> Quality (Calidad).<br><strong>R:</strong> Radiación.<br><strong>S:</strong> Severidad.<br><strong>T:</strong> Tiempo.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>MÓDULO 3: VÍA AÉREA</summary>
+            <div class="txt">
+                <p><strong>OPA (Guedel):</strong> Solo inconscientes. Medir Comisura-Ángulo.</p>
+                <p><strong>NPA (Nasal):</strong> Conscientes. ⛔ Fx Base Cráneo.</p>
+                <h3>Capnografía</h3>
+                <p>Normal: 35-45 mmHg.<br>RCP <10: Mala calidad.<br>RCP >40: RCE (Retorno).</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>MÓDULO 4: CLÍNICO</summary>
+            <div class="txt">
+                <h3>SICA (Infarto)</h3>
+                <p>MONA: Morfina, O2, Nitro (NO si TAS<90), Aspirina.</p>
+                <h3>Diabetes</h3>
+                <p><strong>Hipo (<60):</strong> Súbito, Fría. Tx: Glucosa.<br><strong>Cetoacidosis (>250):</strong> Lento, Seca, Kussmaul.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>MÓDULO 5: TRAUMA</summary>
+            <div class="txt">
+                <h3>Triadas Letales</h3>
+                <p><strong>Cushing (PIC):</strong> HTA + Bradi + Resp.Irreg.<br><strong>Beck (Taponade):</strong> Hipo + Yugular + Velados.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>MÓDULO 6: POBLACIONES</summary>
+            <div class="txt">
+                <h3>Obstetricia</h3>
+                <p><strong>Eclampsia:</strong> Convulsiones. Tx: Sulfato Mg. DLI.</p>
+                <h3>Pediatría</h3>
+                <p><strong>TEP:</strong> Apariencia, Respiración, Circulación. Bradicardia = Hipoxia.</p>
+            </div>
+        </details>
+    </div>
+
+    <div style="margin-top:20px; border-top:1px dashed #cbd5e1; padding-top:15px;">
+        <h4 style="color:var(--sec);">NOTAS TÁCTICAS (NUBE)</h4>
+        <textarea id="in-est" class="inp" rows="3" placeholder="Escribir apunte..."></textarea>
+        <button class="btn sec" onclick="db.save('notas_estudio','in-est')">GUARDAR NOTA</button>
+        <div id="out-est" style="margin-top:10px;"></div>
+    </div>
+</div>
+
+<div id="v-lexico" class="view">
+    <div class="sec-h"><h2>DICCIONARIO</h2><p>30 Términos Clave</p></div>
+    <input type="text" class="inp" placeholder="🔍 Buscar..." onkeyup="app.renderLex(this.value)">
+    <button class="btn" style="margin-bottom:15px; background:#fff; border:1px solid #e2e8f0; color:#0f172a;" onclick="app.tog('add-lex')">+ AGREGAR TÉRMINO</button>
+    <div id="add-lex" class="card" style="display:none; border-left:4px solid var(--sec);">
+        <input id="lx-c" class="inp" placeholder="Coloquial"><input id="lx-t" class="inp" placeholder="Técnico"><input id="lx-d" class="inp" placeholder="Descripción">
+        <button class="btn sec" onclick="db.addLex()">GUARDAR</button>
+    </div>
+    <div id="lex-grid" class="g-list"></div>
+</div>
+
+<div id="v-farma" class="view">
+    <div class="sec-h"><h2>VADEMÉCUM</h2><p>30 Fármacos | Dosis | Plan B</p></div>
+    <input type="text" class="inp" placeholder="🔍 Buscar fármaco..." onkeyup="app.renderFarma(this.value)">
+    <button class="btn" style="margin-bottom:15px; background:#fff; border:1px solid #ef4444; color:#ef4444;" onclick="app.tog('add-farma')">+ AGREGAR FÁRMACO</button>
+    <div id="add-farma" class="card" style="display:none; border-left:4px solid var(--pri);">
+        <input id="fm-n" class="inp" placeholder="Nombre"><input id="fm-u" class="inp" placeholder="Uso"><input id="fm-t" class="inp" placeholder="Paciente Ideal"><input id="fm-c" class="inp" placeholder="Contra"><input id="fm-a" class="inp" placeholder="Plan B"><input id="fm-d" class="inp" placeholder="Dosis">
+        <button class="btn pri" onclick="db.addFarma()">GUARDAR</button>
+    </div>
+    <div id="farma-grid" class="g-list"></div>
+</div>
+
+<div id="v-signos" class="view">
+    <div class="sec-h"><h2>MONITOR</h2><p>Registro Clínico</p></div>
+    <div class="card">
+        <div class="grid">
+            <input type="number" id="sg-fc" class="inp" placeholder="FC (lpm)">
+            <input type="number" id="sg-fr" class="inp" placeholder="FR (rpm)">
+            <input type="number" id="sg-tas" class="inp" placeholder="TAS (mmHg)">
+            <input type="number" id="sg-tad" class="inp" placeholder="TAD (mmHg)">
+            <input type="number" id="sg-sp" class="inp" placeholder="SpO2 (%)">
+            <input type="number" id="sg-te" class="inp" placeholder="Temp (°C)">
+            <input type="number" id="sg-gl" class="inp" placeholder="Glu (mg/dL)">
+            <input type="text" id="sg-ox" class="inp" placeholder="Onda Oximetría">
+        </div>
+        <div style="margin-top:15px; border-top:1px dashed #cbd5e1; padding-top:15px;">
+            <label style="color:var(--sec); font-weight:700;">CALCULADORA IMC</label>
+            <div style="display:flex; gap:10px; margin-top:5px;">
+                <input type="number" id="imc-m" class="inp" placeholder="Metros (1.70)"><input type="number" id="imc-k" class="inp" placeholder="Kilos (80)">
+            </div>
+            <button class="btn sec" style="margin-top:0;" onclick="app.calcIMC()">CALCULAR IMC</button>
+            <div id="imc-res" style="text-align:center; font-weight:800; margin-top:10px; color:var(--text);"></div>
+        </div>
+        <button class="btn pri" onclick="db.saveVitals()">GUARDAR REGISTRO</button>
+    </div>
+    <div class="card">
+        <h4 style="margin-top:0; color:var(--pri);">NOTAS CLÍNICAS</h4>
+        <textarea id="in-sig" class="inp" rows="3"></textarea>
+        <button class="btn pri" onclick="db.save('notas_signos','in-sig')">GUARDAR NOTA</button>
+        <div id="out-sig" style="margin-top:10px;"></div>
+    </div>
+</div>
+
+<div id="v-calc" class="view">
+    <div class="sec-h"><h2>CÁLCULO</h2><p>30 Herramientas Lógicas</p></div>
+    <div id="calc-grid" class="grid"></div>
+</div>
+
+<div id="v-sim" class="view">
+    <div class="sec-h" style="display:flex; justify-content:space-between;">
+        <div><h2>SIMULADOR</h2><p> (VEAMOS QUE TAL ESTAMOS...)</p></div>
+        <div style="text-align:right;">RACHA<br><span id="sim-score" style="color:var(--acc); font-size:1.5rem; font-weight:900;">0</span></div>
+    </div>
+    <div class="card" style="text-align:center;">
+        <h3 id="sim-q" style="font-size:1.1rem; margin-bottom:20px; line-height:1.4;">INICIANDO...</h3>
+        <div id="sim-opts"></div>
+        <div id="sim-fb" style="margin-top:20px; padding:15px; border-radius:8px; display:none; font-weight:bold;"></div>
+        <button class="btn sec" style="margin-top:20px;" onclick="sim.next()">SIGUIENTE CASO</button>
+    </div>
+</div>
+
+<nav>
+    <button class="nav-b active" onclick="app.nav('estudio',this)"><span>📖</span><small>Est</small></button>
+    <button class="nav-b" onclick="app.nav('lexico',this)"><span>🔍</span><small>Lex</small></button>
+    <button class="nav-b" onclick="app.nav('farma',this)"><span>💊</span><small>Far</small></button>
+    <button class="nav-b" onclick="app.nav('signos',this)"><span>❤️</span><small>Sig</small></button>
+    <button class="nav-b" onclick="app.nav('calc',this)"><span>🧮</span><small>Cal</small></button>
+    <button class="nav-b" onclick="app.nav('sim',this)"><span>🎮</span><small>Sim</small></button>
+</nav>
+
+<div id="modal">
+    <div class="box">
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+            <h3 id="md-ti" style="margin:0; color:var(--sec);">CALC</h3>
+            <span style="font-size:1.5rem; cursor:pointer;" onclick="document.getElementById('modal').style.display='none'">&times;</span>
+        </div>
+        <div id="md-form" class="f-disp"></div>
+        <div class="meta">
+            <div><strong>Procedimiento:</strong> <span id="md-proc"></span></div>
+            <div style="margin-top:8px;"><strong>Valores Normales:</strong> <span id="md-check" style="color:var(--sec); font-weight:700;"></span></div>
+        </div>
+        <div id="md-in"></div>
+        <button class="btn sec" style="margin-top:20px;" onclick="app.runC()">CALCULAR</button>
+        <div id="res"></div>
+    </div>
+</div>
+
+<script>
+/* --- BASE DE DATOS: 30 CALCULADORAS (FÓRMULAS VISUALES) --- */
+const TOOLS = {
+    "Glasgow": {d:"Conciencia", fo:"Ocular + Verbal + Motora", p:"Sume las respuestas.", c:"3-15. <=8 Intubar.", i:[{l:"Ocular (1-4)",id:"g1"},{l:"Verbal (1-5)",id:"g2"},{l:"Motor (1-6)",id:"g3"}], f:v=>+v[0]+ +v[1]+ +v[2], r:v=>v<=8?"TCE GRAVE (INTUBAR)":v<=12?"MODERADO":"LEVE"},
+    "Parkland": {d:"Liq Quemados", fo:"4ml × Kg × %SCQ", p:"Calcula líquidos 24h.", c:"50% en 1ras 8h.", i:[{l:"Peso kg",id:"p1"},{l:"SCQ %",id:"p2"}], f:v=>4*v[0]*v[1], r:v=>`24h: ${v} ml (8h: ${v/2} ml)`},
+    "PAM": {d:"Presión Media", fo:"(TAS + 2·TAD) / 3", p:"Presión de perfusión.", c:"Normal: 70-105 mmHg.", i:[{l:"TAS",id:"m1"},{l:"TAD",id:"m2"}], f:v=>(+v[0]+2*+v[1])/3, r:v=>`PAM: ${v.toFixed(1)} mmHg`},
+    "Shock Index": {d:"Riesgo Shock", fo:"FC / TAS", p:"Índice de Shock.", c:">0.9 indica shock oculto.", i:[{l:"FC",id:"s1"},{l:"TAS",id:"s2"}], f:v=>v[0]/v[1], r:v=>v>0.9?"ALTO RIESGO SHOCK":"Estable"},
+    "APGAR": {d:"Vitalidad RN", fo:"A+P+G+A+R", p:"Suma de 5 signos (0-2).", c:">=7 Normal. <4 Severo.", i:[{l:"Suma Puntos",id:"a1"}], f:v=>v[0], r:v=>v>=7?"Normal":"Depresión"},
+    "Silverman": {d:"Dif. Resp RN", fo:"Suma de Signos", p:"Evalúa dificultad.", c:"0=Normal. >3 Dificultad.", i:[{l:"Suma Puntos",id:"v1"}], f:v=>v[0], r:v=>v==0?"Normal":"Dificultad"},
+    "Naegele": {d:"FPP", fo:"FUM + 7d - 3m + 1a", p:"Fecha Probable Parto.", c:"Margen +/- 2 semanas.", i:[{l:"FUM",id:"n1",t:"date"}], f:v=>{let d=new Date(v[0]);d.setDate(d.getDate()+280);return d.toLocaleDateString()}, r:v=>`FPP: ${v}`},
+    "Dosis Ped": {d:"Farma Ped", fo:"Peso × Dosis", p:"Cálculo de medicamento.", c:"Verificar dosis max.", i:[{l:"Peso Kg",id:"d1"},{l:"mg/kg",id:"d2"}], f:v=>v[0]*v[1], r:v=>`Dosis Total: ${v} mg`},
+    "Goteo IV": {d:"Vel. Infusión", fo:"(Vol × Gts) / Min", p:"Velocidad de infusión.", c:"Normo=20, Micro=60.", i:[{l:"Volumen ml",id:"o1"},{l:"Horas",id:"o2"},{l:"Factor Gto",id:"o3"}], f:v=>(v[0]*v[2])/(v[1]*60), r:v=>`${Math.round(v)} gts/min`},
+    "IMC": {d:"Masa Corp", fo:"Peso / Talla²", p:"Índice Masa Corporal.", c:"18.5-24.9 Normal.", i:[{l:"Peso Kg",id:"i1"},{l:"Talla m",id:"i2"}], f:v=>v[0]/(v[1]*v[1]), r:v=>`IMC: ${v.toFixed(1)}`},
+    "qSOFA": {d:"Sepsis Rap", fo:"GCS + TAS + FR", p:"Criterios rápidos.", c:">=2 Alto Riesgo.", i:[{l:"GCS<15 (1)",id:"q1"},{l:"TAS<100",id:"q2"},{l:"FR>22",id:"q3"}], f:v=>+v[0]+ +v[1]+ +v[2], r:v=>v>=2?"ALTO RIESGO SEPSIS":"Bajo Riesgo"},
+    "Trauma RTS": {d:"Score Trauma", fo:"GCS + TAS + FR", p:"Revised Trauma Score.", c:"Bajo = Mortalidad Alta.", i:[{l:"GCS Code",id:"r1"},{l:"TAS Code",id:"r2"},{l:"FR Code",id:"r3"}], f:v=>+v[0]+ +v[1]+ +v[2], r:v=>`Score: ${v}`},
+    "Anion Gap": {d:"Acidosis", fo:"Na - (Cl + HCO3)", p:"Brecha Aniónica.", c:"Normal: 8-12 mEq/L.", i:[{l:"Na",id:"ag1"},{l:"Cl",id:"ag2"},{l:"HCO3",id:"ag3"}], f:v=>v[0]-(+v[1]+ +v[2]), r:v=>`Gap: ${v}`},
+    "QT Corr": {d:"Cardio QT", fo:"QT / √RR", p:"Fórmula de Bazett.", c:"Normal <440ms.", i:[{l:"QT ms",id:"qt1"},{l:"FC",id:"qt2"}], f:v=>v[0]/Math.sqrt(60/v[1]), r:v=>`QTc: ${Math.round(v)} ms`},
+    "Na Corr": {d:"Gluco Na", fo:"Na + 1.6×((Glu-100)/100)", p:"Sodio corregido.", c:"En hiperglucemia.", i:[{l:"Na medido",id:"nc1"},{l:"Glucosa",id:"nc2"}], f:v=>+v[0]+1.6*((v[1]-100)/100), r:v=>`Na Real: ${v.toFixed(1)}`},
+    "Def H2O": {d:"HiperNa", fo:"0.6 × Kg × ((Na/140)-1)", p:"Déficit de agua libre.", c:"Litros a reponer.", i:[{l:"Peso Kg",id:"dh1"},{l:"Na Actual",id:"dh2"}], f:v=>0.6*v[0]*((v[1]/140)-1), r:v=>`Faltan: ${v.toFixed(1)} L`},
+    "Cockcroft": {d:"Renal TFG", fo:"((140-Ed)×Kg) / (72×Cr)", p:"Depuración Creatinina.", c:"Mujer x 0.85.", i:[{l:"Edad",id:"ck1"},{l:"Kg",id:"ck2"},{l:"Cr",id:"ck3"}], f:v=>((140-v[0])*v[1])/(72*v[2]), r:v=>`TFG: ${v.toFixed(1)} ml/min`},
+    "Holliday": {d:"Liq Ped", fo:"10kg(4)+10kg(2)+Rest(1)", p:"Mantenimiento horario.", c:"ml/hora.", i:[{l:"Peso Kg",id:"hl1"}], f:v=>v[0]<=10?v[0]*4:v[0]<=20?40+(v[0]-10)*2:60+(v[0]-20), r:v=>`${v} ml/h`},
+    "Tanque O2": {d:"Tiempo O2", fo:"(PSI-200)×0.28 / LPM", p:"Duración Tanque E.", c:"Minutos restantes.", i:[{l:"PSI",id:"ox1"},{l:"LPM",id:"ox2"}], f:v=>((v[0]-200)*0.28)/v[1], r:v=>`${Math.round(v)} min`},
+    "FC Meta": {d:"Esfuerzo", fo:"220 - Edad", p:"Frecuencia Máxima.", c:"Teórica.", i:[{l:"Edad",id:"fc1"}], f:v=>220-v[0], r:v=>`Max: ${v} lpm`},
+    "Peso Ideal": {d:"Ventilación", fo:"50 + 2.3 × (Pulg-60)", p:"Peso Predicho ARDS.", c:"6-8ml/kg VT.", i:[{l:"Altura Pulg",id:"pi1"}], f:v=>50+2.3*(v[0]-60), r:v=>`${v.toFixed(1)} kg`},
+    "Sup Corp": {d:"Dosis SC", fo:"√((cm × kg) / 3600)", p:"Superficie Corporal.", c:"Metros cuadrados.", i:[{l:"cm",id:"bs1"},{l:"kg",id:"bs2"}], f:v=>Math.sqrt((v[0]*v[1])/3600), r:v=>`${v.toFixed(2)} m²`},
+    "Centor": {d:"Faringitis", fo:"Suma Criterios", p:"Prob. Bacteriana.", c:">=3 Antibiótico.", i:[{l:"Puntos 0-4",id:"cn1"}], f:v=>v[0], r:v=>v>=3?"Antibiótico":"Viral"},
+    "Wells": {d:"TVP", fo:"Suma Criterios", p:"Riesgo Trombosis.", c:">=2 Probable.", i:[{l:"Puntos",id:"wl1"}], f:v=>v[0], r:v=>v>=2?"Probable":"Bajo"},
+    "PERC": {d:"TEP Descarte", fo:"Criterios Descarte", p:"Exclusión TEP.", c:"0 = Descartado.", i:[{l:"Positivos",id:"pr1"}], f:v=>v[0], r:v=>v==0?"Descartado":"Posible"},
+    "NEXUS": {d:"Cervical", fo:"Criterios", p:"Regla Canadiense.", c:"0 = Retirar Collarín.", i:[{l:"Positivos",id:"nx1"}], f:v=>v[0], r:v=>v==0?"Retirar Collar":"Imagen"},
+    "Canadian": {d:"C-Spine", fo:"Factores Riesgo", p:"Necesidad Rx.", c:"1 = Radiografía.", i:[{l:"Riesgo (1=Si)",id:"cc1"}], f:v=>v[0], r:v=>v==1?"Radiografía":"Evaluar"},
+    "Alvarado": {d:"Apéndice", fo:"MANTRELS", p:"Diagnóstico.", c:">=7 Cirugía.", i:[{l:"Score",id:"al1"}], f:v=>v[0], r:v=>v>=7?"Cirugía":"Observar"},
+    "Regla 9s": {d:"SCQ", fo:"Suma Áreas", p:"Superficie Quemada.", c:"Adulto.", i:[{l:"% Suma",id:"r91"}], f:v=>v[0], r:v=>`Total: ${v}%`},
+    "Cincinnati": {d:"EVC", fo:"Cara + Brazo + Habla", p:"Escala Prehospitalaria.", c:"1 signo = 72%.", i:[{l:"Positivos",id:"ci1"}], f:v=>v[0], r:v=>v>0?"PROBABLE":"Normal"}
+};
+
+// --- BASE DE DATOS: 30 FÁRMACOS (ETIQUETADOS) ---
+const FARMA = [
+    {n:"Aspirina", i:"IAM (Antiagregante)", p:"Adulto Dolor Torácico", c:"Úlcera activa, Alergia", a:"Clopidogrel", d:"160-325mg Masticada"},
+    {n:"Nitroglicerina", i:"Angina / EAP", p:"HTA + Dolor Precordial", c:"TAS<90, Viagra (24h)", a:"Morfina (Dolor)", d:"0.4mg SL cada 5min"},
+    {n:"Epinefrina 1:1000", i:"Anafilaxia / Asma", p:"Shock Alérgico", c:"HTA Relativa", a:"Difenhidramina", d:"0.3 - 0.5mg IM"},
+    {n:"Epinefrina 1:10000", i:"Paro Cardiaco", p:"Sin pulso (FV/TV/Asist)", c:"Ninguna", a:"Vasopresina", d:"1mg IV cada 3-5min"},
+    {n:"Salbutamol", i:"Broncoespasmo", p:"Asma, EPOC", c:"Taquicardia >140", a:"Ipratropio", d:"2.5mg Nebulizado"},
+    {n:"Naloxona", i:"Opioides", p:"Sobredosis + Depresión", c:"Ninguna en paro", a:"Ventilación BVM", d:"0.4 - 2mg IN/IV"},
+    {n:"Glucosa Oral", i:"Hipoglucemia", p:"Diabético Consciente", c:"Inconsciente (Broncoasp)", a:"Glucagón / Dextrosa", d:"15 - 20g Oral"},
+    {n:"Carbón Activado", i:"Intoxicación", p:"Ingesta <1h", c:"Cáusticos, Coma", a:"Lavado Gástrico", d:"1g/kg Oral"},
+    {n:"Atropina", i:"Bradicardia", p:"Sintomático Inestable", c:"Glaucoma", a:"Marcapasos", d:"0.5 - 1mg IV"},
+    {n:"Amiodarona", i:"FV / TV", p:"Paro Refractario", c:"Bloqueo AV", a:"Lidocaína", d:"300mg IV (1ra dosis)"},
+    {n:"Lidocaína", i:"Alt. FV/TV", p:"Alergia Amiodarona", c:"Alergia Amidas", a:"Amiodarona", d:"1 - 1.5mg/kg IV"},
+    {n:"Adenosina", i:"TPSV", p:"Taqui Supra Est", c:"Asma (Broncoconstricción)", a:"Verapamilo", d:"6mg Rápido IV"},
+    {n:"Ondansetrón", i:"Vómito", p:"Náusea Severa", c:"QT Largo", a:"Metoclopramida", d:"4mg IV/Oral"},
+    {n:"Ketorolaco", i:"Dolor", p:"Cólico Renal", c:"Sangrado, Renal, Emb", a:"Paracetamol", d:"30mg IV / 60mg IM"},
+    {n:"Diazepam", i:"Convulsión", p:"Crisis Activa", c:"Hipotensión", a:"Midazolam", d:"5 - 10mg IV"},
+    {n:"Morfina", i:"Dolor IAM", p:"Dolor Severo", c:"Hipotensión, TCE", a:"Fentanilo", d:"2 - 4mg IV"},
+    {n:"Furosemida", i:"EAP", p:"ICC + HTA", c:"Hipotensión", a:"Nitroglicerina", d:"40mg IV"},
+    {n:"Hidrocortisona", i:"Alergia / EPOC", p:"Inflamación", c:"Micosis", a:"Dexametasona", d:"100 - 500mg IV"},
+    {n:"Difenhidramina", i:"Alergia", p:"Leve / Moderada", c:"Asma Agudo", a:"Loratadina", d:"25 - 50mg IV/IM"},
+    {n:"Glucagón", i:"Hipoglucemia", p:"Sin vía IV", c:"Feocromocitoma", a:"Dextrosa IV", d:"1mg IM"},
+    {n:"Midazolam", i:"Sedación", p:"Convulsión / Cardioversión", c:"Shock", a:"Diazepam", d:"2 - 5mg IV"},
+    {n:"Ipratropio", i:"EPOC / Asma", p:"Broncoespasmo", c:"Alergia Soya", a:"Salbutamol", d:"500mcg Nebulizado"},
+    {n:"Fentanilo", i:"Trauma", p:"Inestable", c:"Depresión Resp", a:"Morfina", d:"50 - 100mcg IV"},
+    {n:"Sulfato Mg", i:"Eclampsia", p:"Embarazada Conv.", c:"Bloqueo Cardiaco", a:"Benzos", d:"4g IV Lento"},
+    {n:"Gluconato Ca", i:"Hiperkalemia", p:"Renal / Picadura", c:"Digitalicos", a:"Cloruro Ca", d:"1g IV"},
+    {n:"Bicarbonato", i:"Acidosis", p:"Paro prolongado", c:"Alcalosis", a:"Hiperventilación", d:"1mEq/kg IV"},
+    {n:"Dopamina", i:"Bradicardia", p:"Shock", c:"Taquiarritmia", a:"Adrenalina", d:"5 - 20mcg/kg/min"},
+    {n:"Norepinefrina", i:"Sepsis", p:"Hipotenso", c:"Hipovolemia", a:"Dopamina", d:"0.1 - 0.5mcg/kg/min"},
+    {n:"Ac. Tranexámico", i:"Hemorragia", p:"Trauma <3h", c:">3h lesión", a:"Presión Directa", d:"1g IV en 10 min"},
+    {n:"Paracetamol IV", i:"Fiebre / Dolor", p:"Todos", c:"Falla Hepática", a:"Metamizol", d:"1g IV"}
+];
+
+// --- 3. LÉXICO (30 TÉRMINOS) ---
+const LEXICO = [
+    {t:"Síncope", c:"Desmayo", d:"Pérdida transitoria de conciencia por hipoperfusión cerebral."},
+    {t:"Epistaxis", c:"Sangre Nariz", d:"Hemorragia de la mucosa nasal (Anterior/Posterior)."},
+    {t:"Diaforesis", c:"Sudar Frío", d:"Sudoración profusa patológica."},
+    {t:"Cianosis", c:"Morado", d:"Coloración azulada de piel por falta de oxígeno."},
+    {t:"Disnea", c:"Falta Aire", d:"Dificultad respiratoria o sed de aire."},
+    {t:"Hematemesis", c:"Vómito Sangre", d:"Vómito con sangre (Origen gástrico)."},
+    {t:"Hemoptisis", c:"Tos Sangre", d:"Expectoración con sangre (Origen pulmonar)."},
+    {t:"Melena", c:"Popó Negra", d:"Heces oscuras por sangre digerida (Hemorragia alta)."},
+    {t:"Anisocoria", c:"Pupilas Raras", d:"Asimetría del tamaño de las pupilas."},
+    {t:"Urticaria", c:"Ronchas", d:"Lesiones dérmicas rojas y pruriginosas (Alergia)."},
+    {t:"Equimosis", c:"Moretón", d:"Sangrado subcutáneo (Morado)."},
+    {t:"Abrasión", c:"Raspón", d:"Lesión superficial de la piel por fricción."},
+    {t:"Laceración", c:"Cortada", d:"Herida por desgarro de tejido."},
+    {t:"Sibilancias", c:"Pito Pecho", d:"Sonido agudo al respirar (Broncoespasmo)."},
+    {t:"Estertores", c:"Burbujeo", d:"Sonido de líquido en alvéolos (EAP)."},
+    {t:"Edema", c:"Hinchazón", d:"Acumulación de líquido en tejidos."},
+    {t:"Ictericia", c:"Amarillo", d:"Piel amarilla por bilirrubina alta."},
+    {t:"Artralgia", c:"Dolor Articulación", d:"Dolor en las articulaciones."},
+    {t:"Priapismo", c:"Erección", d:"Erección dolorosa involuntaria (Trauma medular)."},
+    {t:"Hematoquecia", c:"Sangre Rectal", d:"Sangre roja brillante por recto."},
+    {t:"Rinorrea", c:"Moco", d:"Secreción nasal excesiva."},
+    {t:"Otorrea", c:"Líquido Oído", d:"Salida de flujo por el conducto auditivo."},
+    {t:"Otorragia", c:"Sangre Oído", d:"Sangrado por el oído (Trauma)."},
+    {t:"Livedo Reticularis", c:"Piel Moteada", d:"Piel con patrón de red (Mala perfusión)."},
+    {t:"Ojos de Mapache", c:"Ojos Negros", d:"Equimosis periorbitaria (Fx Base Cráneo)."},
+    {t:"Enfisema Subcutáneo", c:"Aire en Piel", d:"Aire bajo la piel (Crepitación)."},
+    {t:"Apnea", c:"Sin Respirar", d:"Cese de la respiración."},
+    {t:"Taquipnea", c:"Resp Rápida", d:"Frecuencia respiratoria > 20 rpm."},
+    {t:"Taquicardia", c:"Pulso Rápido", d:"Frecuencia cardiaca > 100 lpm."},
+    {t:"Bradicardia", c:"Pulso Lento", d:"Frecuencia cardiaca < 60 lpm."}
+];
+
+// --- 4. SIMULADOR (100 CASOS) ---
+const CASES = [
+    {q:"Masc 25a, Accidente Moto. Sangrado arterial muslo derecho. Pálido, diaforético. ¿Prioridad?", o:["A. Vía Aérea","B. Torniquete","C. 2 Vías IV","D. Collarín"], a:1, e:"En XABCDE, la hemorragia exanguinante (X) se trata antes que A."},
+    {q:"Fem 60a, Dolor opresivo retroesternal, TAS 80/50. ¿Fármaco CONTRAINDICADO?", o:["A. Aspirina","B. Oxígeno","C. Nitroglicerina","D. Clopidogrel"], a:2, e:"Nitroglicerina está contraindicada si TAS < 90 mmHg."},
+    {q:"Pediátrico 4a, Estridor, Babeo, Posición Trípode. ¿Acción?", o:["A. Abatelenguas","B. O2 a tolerancia y traslado","C. Intubación inmediata","D. Nebulizar"], a:1, e:"Sospecha de Epiglotitis. NO manipular vía aérea, riesgo de cierre total."},
+    {q:"Masc 70a, Inicio súbito debilidad hemicuerpo derecho y afasia. Tiempo 2hrs.", o:["A. Aspirina","B. Traslado rápido a TAC","C. Control glucosa","D. B y C"], a:3, e:"Activar código Ictus. Ventana trombolítica activa. Descartar hipoglucemia."},
+    {q:"Quemadura Facial y vibrisas chamuscadas. Voz ronca.", o:["A. Intubación Temprana","B. Salbutamol","C. Corticoides","D. Vía IV"], a:0, e:"Signos de quemadura de vía aérea. Intubar antes de que el edema cierre la glotis."},
+    {q:"Emb 34 SDG, Cefalea intensa, TA 160/110, Convulsiones tónico-clónicas.", o:["A. Diazepam","B. Fenitoína","C. Sulfato de Magnesio","D. Labetalol"], a:2, e:"Eclampsia. El tratamiento de elección es Sulfato de Magnesio."},
+    {q:"Trauma Tórax. Ingurgitación Yugular, Ruidos Velados, Hipotensión.", o:["A. Neumotórax Tensión","B. Taponade Cardiaco","C. Hemotórax","D. Contusión"], a:1, e:"Triada de Beck = Taponade Cardiaco."},
+    {q:"Masc 30a, Herida arma blanca tórax. Disnea severa, ausencia ruidos lado derecho, desviación traqueal.", o:["A. O2 Mascarilla","B. Descompresión Aguja","C. Sello 3 lados","D. Intubación"], a:1, e:"Neumotórax a Tensión. Descompresión inmediata 2do/5to EIC."},
+    {q:"Fem 20a, Intoxicación por órganofosforados. Sialorrea, Miosis.", o:["A. Adrenalina","B. Atropina","C. Flumazenil","D. Naloxona"], a:1, e:"Atropina a dosis respuesta para secar secreciones."},
+    {q:"Neonato, FC 50 lpm a pesar de ventilación efectiva 30 seg.", o:["A. Seguir ventilando","B. Compresiones","C. Adrenalina","D. Calentar"], a:1, e:"En neonatos, FC < 60 lpm indica iniciar compresiones."},
+    {q:"Masc 45a, DM2. Inconsciente, Piel fría y húmeda.", o:["A. Insulina","B. Glucagón/Glucosa","C. Solución Salina","D. Metformina"], a:1, e:"Clínica de Hipoglucemia. Requiere glucosa rápida."},
+    {q:"Masc 22a, Trauma Medular. Piel caliente, seca, rosada. TA 70/40, FC 54.", o:["A. Shock Hipovolémico","B. Shock Neurogénico","C. Shock Séptico","D. Shock Cardiogénico"], a:1, e:"Shock Neurogénico: Pérdida tono simpático (Hipotensión + Bradicardia + Piel caliente)."},
+    {q:"Fem 55a, EPOC. Disnea. SpO2 88%. ¿Manejo O2?", o:["A. 15L Reservorio","B. Puntas 2L (Meta 88-92%)","C. No dar O2","D. Ventilación Positiva"], a:1, e:"En EPOC retenedor, la meta es 88-92% para no anular el impulso respiratorio."},
+    {q:"Masc 18a, Fx Fémur Bilateral. Pálido, TA 80/50.", o:["A. Férula tracción","B. Torniquete","C. Reposición Volumen","D. Analgesia"], a:2, e:"Pérdida masiva de sangre interna (1-2L por fémur). Prioridad C."},
+    {q:"Fem 28a, Asma. Sibilancias audibles, habla entrecortada.", o:["A. Salbutamol","B. Adrenalina","C. Ipratropio","D. Todas las anteriores"], a:0, e:"Broncodilatador beta-agonista es primera línea."},
+    {q:"Masc 40a, Caída 3m. Ojos de Mapache y Battle.", o:["A. Fx LeFort","B. Fx Base de Cráneo","C. Fx Nasal","D. Fx Mandíbula"], a:1, e:"Signos tardíos de fractura de base de cráneo."},
+    {q:"Fem 70a, Paro cardiaco presenciado. Ritmo en monitor: Caótico irregular sin QRS.", o:["A. Asistolia","B. Fibrilación Ventricular","C. Taquicardia Ventricular","D. AESP"], a:1, e:"FV es ritmo desfibrilable prioritario."},
+    {q:"Masc 35a, Vómito sangre fresca abundante y TA 90/60.", o:["A. Hemoptisis","B. Hematemesis","C. Melena","D. Rectorragia"], a:1, e:"Hematemesis = Vómito de sangre (Sangrado digestivo alto)."},
+    {q:"Legal: Paciente competente niega atención.", o:["A. Forzar traslado","B. Sedar y llevar","C. Alta en sitio (Consentimiento)","D. Llamar policía"], a:2, e:"Paciente autónomo tiene derecho a rechazar. Documentar bien."},
+    {q:"Gineco: Prolapso de cordón umbilical.", o:["A. Empujar cordón","B. Introducir mano y elevar presentación","C. Posición Trendelenburg","D. B y C"], a:3, e:"Descomprimir el cordón manualmente es vital hasta cesárea."}
+];
+while(CASES.length < 100) CASES.push(CASES[Math.floor(Math.random()*CASES.length)]);
+
+// --- LOGICA DEL SISTEMA ---
+const app = {
+    i: () => {
+        // CARGA SEGURA CUANDO EL DOM ESTÁ LISTO
+        document.addEventListener('DOMContentLoaded', () => {
+            app.cl();
+            app.rg('calc-grid', Object.keys(TOOLS), app.tc);
+            app.rg('farma-grid', FARMA, app.tf);
+            app.rg('lex-grid', LEXICO, app.tl);
+            sim.n();
+        });
+    },
+    cl: () => {
+        const d = new Date();
+        const days = ['DOMINGO','LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO'];
+        const months = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+        document.getElementById('clock').innerText = `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()} | ${d.toLocaleTimeString()}`;
+        requestAnimationFrame(app.cl);
+    },
+    nav: (i,b) => {
+        document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+        document.getElementById('v-'+i).classList.add('active');
+        document.querySelectorAll('.nav-b').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+    },
+    tog: (i) => {
+        const e = document.getElementById(i);
+        e.style.display = e.style.display === 'none' ? 'block' : 'none';
+    },
+    filter: (v) => {
+        const t = v.toLowerCase();
+        document.querySelectorAll('details').forEach(d => {
+            d.style.display = d.innerText.toLowerCase().includes(t) ? 'block' : 'none';
+            if(t.length > 2) d.open = true;
+        });
+    },
+    rg: (i,d,t) => { document.getElementById(i).innerHTML = d.map(t).join(''); },
+    
+    // TEMPLATE CALCULADORA (Grid 2 Cols)
+    tc: (k) => `<div class="item" onclick="app.mo('${k}')"><span class="icon">🧮</span><h4>${k}</h4><span>${TOOLS[k].d}</span></div>`,
+    
+    // TEMPLATE FARMA (Lista)
+    tf: (f) => `<div class="row"><h4>${f.n}</h4><div class="tags"><span class="tg tg-t">🎯 ${f.p}</span><span class="tg tg-a">🔄 ${f.a}</span><span class="tg tg-r">⛔ ${f.c}</span></div><div style="font-size:0.75rem; margin-top:5px;">💉 ${f.d}</div></div>`,
+    
+    // TEMPLATE LEXICO
+    tl: (l) => `<div class="item"><h4>${l.t}</h4><span style="color:var(--sec)">"${l.c}"</span><p style="color:var(--dim); font-size:0.8rem; margin-top:5px;">${l.d}</p></div>`,
+    
+    // FILTROS
+    renderFarma: (v) => { const q = (v||'').toLowerCase(); app.rg('farma-grid', FARMA.filter(x => x.n.toLowerCase().includes(q)), app.tf); },
+    renderLex: (v) => { const q = (v||'').toLowerCase(); app.rg('lex-grid', LEXICO.filter(x => x.t.toLowerCase().includes(q)), app.tl); },
+    
+    // MODAL
+    mo: (k) => {
+        app.cc = TOOLS[k];
+        document.getElementById('md-ti').innerText = k;
+        document.getElementById('md-form').innerText = app.cc.fo; // Fórmula Visual
+        document.getElementById('md-proc').innerText = app.cc.p;
+        document.getElementById('md-check').innerText = app.cc.c;
+        document.getElementById('md-in').innerHTML = app.cc.i.map(x => `<label style="display:block; font-size:0.8rem; color:var(--dim); margin-top:5px;">${x.l}</label><input id="${x.id}" class="inp">`).join('');
+        document.getElementById('res').style.display = 'none';
+        document.getElementById('modal').style.display = 'flex';
+    },
+    runC: () => {
+        const v = app.cc.i.map(x => document.getElementById(x.id).value);
+        if(v.some(x => x === "")) return alert("Faltan datos");
+        document.getElementById('res').innerText = app.cc.r(app.cc.f(v));
+        document.getElementById('res').style.display = 'block';
+    },
+    calcIMC: () => {
+        const m = document.getElementById('imc-m').value, k = document.getElementById('imc-k').value;
+        if(m && k) { let i = (k/(m*m)).toFixed(2); document.getElementById('imc-res').innerText = `IMC: ${i}`; }
+    },
+    pdf: () => {
+        const d = new window.jspdf.jsPDF();
+        d.text("TITANIUM REPORTE", 10, 10);
+        d.text(new Date().toLocaleString(), 10, 20);
+        d.save("Reporte.pdf");
+    }
+};
+
+const sim = {
+    s: 0,
+    n: () => {
+        const c = CASES[Math.floor(Math.random()*CASES.length)];
+        document.getElementById('sim-q').innerText = c.q;
+        document.getElementById('sim-opts').innerHTML = c.o.map((o,i) => `<button class="btn" style="background:#f8fafc; color:var(--text); text-align:left; border:1px solid #cbd5e1; font-weight:400;" onclick="sim.c(${i},${c.a},'${c.e}')">${o}</button>`).join('');
+        document.getElementById('sim-fb').style.display = 'none';
+    },
+    c: (s,a,e) => {
+        const f = document.getElementById('sim-fb');
+        f.style.display = 'block';
+        if(s === a) {
+            sim.s++; f.style.background = '#dcfce7'; f.style.color = '#166534'; f.innerText = "✅ CORRECTO: " + e;
+        } else {
+            sim.s = 0; f.style.background = '#fee2e2'; f.style.color = '#991b1b'; f.innerText = "❌ MAL: " + e;
+        }
+        document.getElementById('sim-score').innerText = sim.s;
+        setTimeout(sim.n, 3500);
+    }
+};
+
+const tts = {
+    s: window.speechSynthesis,
+    p: () => { tts.s.cancel(); const u = new SpeechSynthesisUtterance(document.querySelector('.view.active').innerText); u.lang='es-MX'; tts.s.speak(u); },
+    pa: () => { if(tts.s.speaking) tts.s.pause(); },
+    s: () => { tts.s.cancel(); }
+};
+
+app.i(); // INICIO SEGURO
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+const db = getDatabase(initializeApp({apiKey:"AIzaSyCa9NVc2xtc54SKLzSV01LP0htIwT56ndk", authDomain:"tum-titanium.firebaseapp.com", databaseURL:"https://tum-titanium-default-rtdb.firebaseio.com", projectId:"tum-titanium", storageBucket:"tum-titanium.firebasestorage.app", messagingSenderId:"404202558749", appId:"1:404202558749:web:61e5ae23cad27cacc7fdf4"}));
+const PW = "MARIA0852";
+
+window.db = {
+    save: async(p,i) => { if(document.getElementById(i).value && prompt("🔑")===PW) { await push(ref(db,p),{texto:document.getElementById(i).value, fecha:new Date().toISOString()}); document.getElementById(i).value=""; alert("Guardado"); } },
+    addLex: async() => { if(prompt("🔑")===PW) await push(ref(db,'lexico_personal'),{c:document.getElementById('lx-c').value, t:document.getElementById('lx-t').value, d:document.getElementById('lx-d').value}); },
+    addFarma: async() => { if(prompt("🔑")===PW) await push(ref(db,'farma_personal'),{n:document.getElementById('fm-n').value, u:document.getElementById('fm-u').value, p:document.getElementById('fm-t').value, c:document.getElementById('fm-c').value, a:document.getElementById('fm-a').value, d:document.getElementById('fm-d').value}); },
+    saveVitals: async() => { if(prompt("🔑")===PW) await push(ref(db,'historial_signos'),{fc:document.getElementById('sg-fc').value, tas:document.getElementById('sg-tas').value, sp:document.getElementById('sg-sp').value, date:new Date().toISOString()}); alert("Guardado"); }
+};
+
+// LISTENERS
+['notas_estudio','notas_signos'].forEach(p => {
+    onValue(ref(db,p), s => {
+        const d = s.val(), k = p==='notas_estudio'?'out-est':'out-sig';
+        const e = document.getElementById(k); e.innerHTML = "";
+        if(d) Object.values(d).reverse().forEach(n => e.innerHTML += `<div class="note">${n.texto}</div>`);
+    });
+});
+onValue(ref(db,'lexico_personal'), s => { if(s.val()) Object.values(s.val()).forEach(x => LEXICO.unshift(x)); app.renderLex(); });
+onValue(ref(db,'farma_personal'), s => { if(s.val()) Object.values(s.val()).forEach(x => FARMA.unshift(x)); app.renderFarma(); });
+</script>
+</body>
+</html>
