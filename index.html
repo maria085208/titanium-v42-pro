@@ -10,19 +10,9 @@
     <style>
         /* --- ESTÉTICA CLÍNICA PROFESIONAL --- */
         :root {
-            --bg: #f1f5f9;       /* Fondo clínico */
-            --card: #ffffff;     /* Tarjetas */
-            --border: #cbd5e1;   /* Bordes */
-            --text: #0f172a;     /* Texto Principal */
-            --dim: #64748b;      /* Texto Secundario */
-            
-            /* COLORES TÁCTICOS */
-            --pri: #ef4444;      /* Rojo Urgencia */
-            --sec: #4f46e5;      /* Indigo Médico */
-            --acc: #10b981;      /* Verde Éxito */
-            --war: #f59e0b;      /* Ambar Alerta */
-            
-            /* UI */
+            --bg: #f1f5f9; --card: #ffffff; --border: #cbd5e1;
+            --text: #0f172a; --dim: #64748b;
+            --pri: #ef4444; --sec: #4f46e5; --acc: #10b981; --war: #f59e0b;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --radius: 12px;
         }
@@ -129,7 +119,7 @@
         .nav-b span { font-size: 1.4rem; } 
         .nav-b small { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; }
 
-        /* MODAL PIZARRÓN */
+        /* MODAL MEJORADO (PIZARRÓN) */
         #modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); z-index: 5000; display: none; justify-content: center; align-items: center; padding: 20px; backdrop-filter: blur(5px); }
         .box { background: #fff; width: 100%; max-width: 500px; padding: 25px; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; position: relative; }
         
@@ -167,7 +157,7 @@
             <summary>MÓDULO 1: OPERACIONES Y SEGURIDAD</summary>
             <div class="txt">
                 <h3>Ley del YO-YO 🪀</h3>
-                <p>Regla fundamental de seguridad en la escena: <strong>1. Primero YO, 2. Luego YO, 3. Al último YO.</strong> Nunca convertirse en una segunda víctima. Si la escena no es segura, NO ENTRAR y solicitar apoyo (policía, bomberos).</p>
+                <p>Regla fundamental de seguridad en la escena: <strong>1. Primero YO</strong> (Seguridad Personal), <strong>2. Luego YO</strong> (Seguridad de mi equipo), <strong>3. Al último YO</strong> (Seguridad del paciente). Nunca convertirse en una segunda víctima. Si la escena no es segura, NO ENTRAR y solicitar apoyo (policía, bomberos).</p>
                 <h3>Evaluación de Escena (Size-up)</h3>
                 <p><strong>1. Seguridad (3S):</strong> Personal, Escena, Situación.<br><strong>2. Cinemática:</strong> Trauma (MOI) o Clínico (NOI).<br><strong>3. Triage:</strong> Número de pacientes y recursos.<br><strong>4. EPP:</strong> Aislamiento de sustancias corporales (Guantes, Gafas).</p>
                 <h3>Aspectos Legales</h3>
@@ -332,7 +322,7 @@
 </div>
 
 <script>
-/* --- BASE DE DATOS: 30 CALCULADORAS (FÓRMULAS VISUALES) --- */
+// --- DATOS DUROS 100% REALES (30 CALCULADORAS) ---
 const TOOLS = {
     "Glasgow": {d:"Conciencia", fo:"Ocular + Verbal + Motora", p:"Sume las respuestas.", c:"3-15. <=8 Intubar.", i:[{l:"Ocular (1-4)",id:"g1"},{l:"Verbal (1-5)",id:"g2"},{l:"Motor (1-6)",id:"g3"}], f:v=>+v[0]+ +v[1]+ +v[2], r:v=>v<=8?"TCE GRAVE (INTUBAR)":v<=12?"MODERADO":"LEVE"},
     "Parkland": {d:"Liq Quemados", fo:"4ml × Kg × %SCQ", p:"Calcula líquidos 24h.", c:"50% en 1ras 8h.", i:[{l:"Peso kg",id:"p1"},{l:"SCQ %",id:"p2"}], f:v=>4*v[0]*v[1], r:v=>`24h: ${v} ml (8h: ${v/2} ml)`},
